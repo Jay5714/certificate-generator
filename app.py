@@ -50,15 +50,15 @@ st.markdown("""
 # === Centered Title ===
 st.markdown("""
     <h1>🎓 Certificate Generator</h1>
-    <h3>PHN Technology Robotics Scholarship Portal</h3>
-    <p>Empowering Innovation • AI • IoT • Robotics • Future Talent</p>
+    <h3>PHN Technology Scholarship Portal</h3>
+    <p> AI • IoT • Robotics </p>
     <hr>
 """, unsafe_allow_html=True)
 
 # === Common Password Authentication ===
-COMMON_PASSWORD = "phnsecure2025"
+COMMON_PASSWORD = "Phn2025"
 
-email = st.text_input("📧 Enter your PHN Technology email:")
+email = st.text_input("📧 Enter eg,user@phntechnology.com email:")
 password = st.text_input("🔑 Enter shared password:", type="password")
 
 if not email.endswith("@phntechnology.com"):
@@ -219,3 +219,4 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
+
