@@ -9,7 +9,7 @@ from io import BytesIO
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e1e1e);
+        background: linear-gradient(-45deg, #1D4ED8, #0f2027, #203a43, #1D4ED8);
         background-size: 400% 400%;
         animation: gradientShift 20s ease infinite;
         color: white;
@@ -22,13 +22,13 @@ st.markdown("""
     }
 
     h1, h2, h3, p {
-        color: #00ffff;
+        color: #ffffff;
         font-family: 'Segoe UI', sans-serif;
     }
 
     .stButton>button, .stDownloadButton>button {
-        background-color: #00ffff !important;
-        color: black !important;
+        background-color: #ffffff !important;
+        color: #1D4ED8 !important;
         border-radius: 5px;
         font-weight: bold;
     }
@@ -39,7 +39,7 @@ st.markdown("""
     }
 
     hr {
-        border: 1px solid #00ffff;
+        border: 1px solid #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -47,11 +47,11 @@ st.markdown("""
 # === App Header ===
 st.title("🎓 Certificate Generator")
 st.markdown("""
-    <h2 style='text-align: center; color: #00ffff; font-family: Segoe UI;'>
-        PHN Technology Scholarship Exam Portal
+    <h2 style='text-align: center; color: #ffffff; font-family: Segoe UI;'>
+        PHN Technology Robotics Scholarship Portal
     </h2>
-    <p style='text-align: center; font-size: 16px; color: #cccccc;'>
-         AI • IoT • Robotics
+    <p style='text-align: center; font-size: 16px; color: #dddddd;'>
+        Empowering Innovation • AI • IoT • Robotics • Future Talent
     </p>
     <hr>
 """, unsafe_allow_html=True)
