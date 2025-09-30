@@ -100,5 +100,8 @@ if uploaded_file:
             mime="application/zip"
         )
 
-    if st.button("🧹 Clear"):
-        st.experimental_rerun()
+ clear = st.button("Clear")
+if clear:
+    st.session_state.clear()
+    st.experimental_rerun()
+
