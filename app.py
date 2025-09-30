@@ -11,10 +11,10 @@ from datetime import datetime
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #e0f7fa, #ffffff);
+        background: linear-gradient(-45deg, #1D4ED8, #0f2027, #203a43, #1D4ED8);
         background-size: 400% 400%;
         animation: gradientShift 20s ease infinite;
-        color: #000000;
+        color: #ffffff;
     }
 
     @keyframes gradientShift {
@@ -23,8 +23,8 @@ st.markdown("""
         100% {background-position: 0% 50%;}
     }
 
-    h1, h2, h3, p, label, .stTextInput label {
-        color: #000000 !important;
+    h1, h2, h3, p, label {
+        color: #ffffff !important;
         font-family: 'Segoe UI', sans-serif;
     }
 
@@ -44,11 +44,11 @@ st.markdown("""
     }
 
     .stMetric label {
-        color: #000000 !important;
+        color: #ffffff !important;
     }
 
     hr {
-        border: 1px solid #1D4ED8;
+        border: 1px solid #ffffff;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -225,3 +225,4 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
+
