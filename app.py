@@ -101,9 +101,9 @@ if uploaded_file:
             mime="application/zip"
         )
 
-# 🗑️ Clear button to reset the app
-clear = st.button("🗑️ Clear")
-if clear:
-    st.session_state.clear()
-    st.experimental_rerun()
+# 🗑️ Clear button to reset the app safely
+if st.button("🗑️ Clear"):
+    st.write("🔄 Resetting app...")
+    st.stop()
+
 
