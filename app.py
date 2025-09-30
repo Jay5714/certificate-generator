@@ -12,6 +12,7 @@ st.write("Upload an Excel file to generate certificates based on qualification s
 
 uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
 
+# === Configuration ===
 font_path = os.path.join("fonts", "DancingScript-VariableFont_wght.ttf")
 font_name = "DancingScript"
 font_size = 23
@@ -76,7 +77,7 @@ if uploaded_file:
 
         st.success(f"✅ Certificates generated for {len(df)} students.")
 
-        # Download buttons
+        # Individual download buttons
         for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
             st.download_button(
                 label=f"📥 Download {name}'s Certificate",
@@ -85,7 +86,7 @@ if uploaded_file:
                 mime="application/pdf"
             )
 
-        # ZIP download
+        # ZIP download button
         zip_buffer = BytesIO()
         with zipfile.ZipFile(zip_buffer, "w") as zip_file:
             for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
@@ -100,7 +101,8 @@ if uploaded_file:
             mime="application/zip"
         )
 
- clear = st.button("Clear")
+# 🗑️ Clear button to reset the app
+clear = st.button("🗑️ Clear")
 if clear:
     st.session_state.clear()
     st.experimental_rerun()
