@@ -55,10 +55,26 @@ st.markdown("""
     <hr>
 """, unsafe_allow_html=True)
 
-# === Email Access Control ===
-email = st.text_input("👤 Enter your PHN Technology email:")
+# === Simple Email + Password Login ===
+users = {
+    "admin@phntechnology.com": "admin123",
+    "user@phntechnology.com": "userpass"
+}
+
+email = st.text_input("📧 Enter your PHN Technology email:")
+password = st.text_input("🔑 Enter password:", type="password")
+
 if email and not email.endswith("@phntechnology.com"):
     st.error("Access restricted to PHN Technology emails only.")
+    st.stop()
+
+if email and password:
+    if email in users and users[email] == password:
+        st.success("✅ Access granted.")
+    else:
+        st.error("❌ Invalid credentials.")
+        st.stop()
+else:
     st.stop()
 
 # === Load or initialize stats ===
