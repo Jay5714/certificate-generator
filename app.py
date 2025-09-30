@@ -48,10 +48,10 @@ st.markdown("""
 st.title("🎓 Certificate Generator")
 st.markdown("""
     <h2 style='text-align: center; color: #00ffff; font-family: Segoe UI;'>
-        PHN Technology Robotics Scholarship Portal
+        PHN Technology Scholarship Exam Portal
     </h2>
     <p style='text-align: center; font-size: 16px; color: #cccccc;'>
-        Empowering Innovation • AI • IoT • Robotics • Future Talent
+         AI • IoT • Robotics
     </p>
     <hr>
 """, unsafe_allow_html=True)
@@ -152,4 +152,5 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
+
 
