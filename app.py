@@ -154,6 +154,27 @@ if uploaded_file:
         with open(stats_file, "w") as f:
             json.dump(stats, f)
 
+        # === Log per email
+        log_entry = {
+            "email": email,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "qualified": qualified_count,
+            "appeared": appeared_count,
+            "total": len(df)
+        }
+
+        log_file = "usage_log.json"
+        if os.path.exists(log_file):
+            with open(log_file, "r") as f:
+                usage_log = json.load(f)
+        else:
+            usage_log = []
+
+        usage_log.append(log_entry)
+
+        with open(log_file, "w") as f:
+            json.dump(usage_log, f, indent=2)
+
         # === Show stats
         st.subheader("📊 Scholarship Stats (All-Time)")
         st.metric("Total Students Processed", stats["total_students"])
