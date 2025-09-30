@@ -5,11 +5,58 @@ import os
 import zipfile
 from io import BytesIO
 
-st.set_page_config(page_title="🎓 Certificate Generator")
+# === Custom Styling ===
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1e1e1e);
+        background-size: 400% 400%;
+        animation: gradientShift 20s ease infinite;
+        color: white;
+    }
 
+    @keyframes gradientShift {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+
+    h1, h2, h3, p {
+        color: #00ffff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .stButton>button, .stDownloadButton>button {
+        background-color: #00ffff !important;
+        color: black !important;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .stFileUploader, .stTextInput, .stSelectbox {
+        background-color: #1e1e1e !important;
+        color: white !important;
+    }
+
+    hr {
+        border: 1px solid #00ffff;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# === App Header ===
 st.title("🎓 Certificate Generator")
-st.write("Upload an Excel file to generate certificates based on qualification status.")
+st.markdown("""
+    <h2 style='text-align: center; color: #00ffff; font-family: Segoe UI;'>
+        PHN Technology Robotics Scholarship Portal
+    </h2>
+    <p style='text-align: center; font-size: 16px; color: #cccccc;'>
+        Empowering Innovation • AI • IoT • Robotics • Future Talent
+    </p>
+    <hr>
+""", unsafe_allow_html=True)
 
+# === File Upload ===
 uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
 
 # === Configuration ===
@@ -105,5 +152,4 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
-
 
