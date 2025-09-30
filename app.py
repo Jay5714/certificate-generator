@@ -1,57 +1,61 @@
-import os
+import streamlit as st
 import pandas as pd
 import fitz  # PyMuPDF
-import streamlit as st
+import os
+import zipfile
 from io import BytesIO
 
-# === Streamlit UI ===
-st.set_page_config(page_title="Certificate Generator", layout="centered")
-st.title("🎓 Certificate Generator")
-st.markdown("Upload an Excel file and generate certificates for your students.")
+st.set_page_config(page_title="🎓 Certificate Generator")
 
-# === File Upload ===
-uploaded_excel = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
-pdf_template = "phnscholar certificate 6.pdf"
-font_path = "fonts/DancingScript-VariableFont_wght.ttf"
+st.title("🎓 Certificate Generator")
+st.write("Upload an Excel file to generate certificates based on qualification status.")
+
+uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
+
+font_path = os.path.join("fonts", "DancingScript-VariableFont_wght.ttf")
 font_name = "DancingScript"
 font_size = 23
+pdf_file = "phnscholar certificate 6.pdf"
 
-if uploaded_excel:
-    df = pd.read_excel(uploaded_excel, header=1, engine='openpyxl')
+if uploaded_file:
+    df = pd.read_excel(uploaded_file, header=1, engine='openpyxl')
     df.columns = df.columns.str.strip()
 
-    # === Load certificate template ===
-    doc = fitz.open(pdf_template)
+    if not os.path.exists(font_path):
+        st.error(f"Font file not found at: {font_path}")
+        st.stop()
+
+    if not os.path.exists(pdf_file):
+        st.error(f"Certificate template not found: {pdf_file}")
+        st.stop()
+
+    doc = fitz.open(pdf_file)
     page_1 = doc.load_page(0)
     page_2 = doc.load_page(1)
 
-    # === Create output folders ===
-    base_folder = os.path.splitext(pdf_template)[0]
-    qualified_folder = os.path.join(base_folder, "Qualified")
-    not_qualified_folder = os.path.join(base_folder, "Not_Qualified")
-    os.makedirs(qualified_folder, exist_ok=True)
-    os.makedirs(not_qualified_folder, exist_ok=True)
+    qualified_pdfs = {}
+    not_qualified_pdfs = {}
 
-    # === Generate certificates ===
-    with st.spinner("Generating certificates..."):
+    if st.button("🎯 Generate Certificates"):
         for _, row in df.iterrows():
             name = str(row['Name']).strip()
             status = str(row['Qualified for Level 2']).strip() if pd.notna(row['Qualified for Level 2']) else ""
 
             if status == "Qualified":
                 template_page = page_2
-                output_folder = qualified_folder
                 y_coord = 401
+                target_dict = qualified_pdfs
             else:
                 template_page = page_1
-                output_folder = not_qualified_folder
                 y_coord = 383
+                target_dict = not_qualified_pdfs
 
             new_pdf = fitz.open()
             new_page = new_pdf.new_page(width=template_page.rect.width, height=template_page.rect.height)
             new_page.show_pdf_page(new_page.rect, doc, template_page.number)
 
             new_page.insert_font(font_name, font_path)
+
             font = fitz.Font(fontfile=font_path)
             text_width = font.text_length(name, fontsize=font_size)
             page_width = template_page.rect.width
@@ -65,11 +69,36 @@ if uploaded_excel:
                 fill=(0, 0, 0)
             )
 
-            safe_name = "".join(c for c in name if c.isalnum() or c in " _-")
-            output_path = os.path.join(output_folder, f"{safe_name}.pdf")
-            new_pdf.save(output_path)
+            output = BytesIO()
+            new_pdf.save(output)
             new_pdf.close()
+            target_dict[name] = output.getvalue()
 
-    st.success(f"✅ Certificates generated for {len(df)} students.")
-    st.markdown(f"📁 Qualified certificates saved in: `{qualified_folder}`")
-    st.markdown(f"📁 Not Qualified certificates saved in: `{not_qualified_folder}`")
+        st.success(f"✅ Certificates generated for {len(df)} students.")
+
+        # Download buttons
+        for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
+            st.download_button(
+                label=f"📥 Download {name}'s Certificate",
+                data=pdf_bytes,
+                file_name=f"{name}_certificate.pdf",
+                mime="application/pdf"
+            )
+
+        # ZIP download
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+            for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
+                safe_name = "".join(c for c in name if c.isalnum() or c in " _-")
+                zip_file.writestr(f"{safe_name}_certificate.pdf", pdf_bytes)
+        zip_buffer.seek(0)
+
+        st.download_button(
+            label="📦 Download All Certificates as ZIP",
+            data=zip_buffer,
+            file_name="certificates.zip",
+            mime="application/zip"
+        )
+
+    if st.button("🧹 Clear"):
+        st.experimental_rerun()
