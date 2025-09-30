@@ -55,11 +55,24 @@ st.markdown("""
     <hr>
 """, unsafe_allow_html=True)
 
-# === Email Login ===
+# === User Authentication ===
+users = {
+    "jaydeep.nikam@phntechnology.com": "jaydeep123",
+    "mayur.sabale@phntechnology.com": "mayur456"
+}
+
 email = st.text_input("📧 Enter your PHN Technology email:")
+password = st.text_input("🔑 Enter your password:", type="password")
+
 if not email.endswith("@phntechnology.com"):
     st.error("Access restricted to PHN Technology emails only.")
     st.stop()
+
+if email not in users or users[email] != password:
+    st.error("Invalid email or password.")
+    st.stop()
+
+st.success("✅ Access granted.")
 
 # === Load or initialize stats ===
 stats_file = "stats.json"
