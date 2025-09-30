@@ -55,26 +55,10 @@ st.markdown("""
     <hr>
 """, unsafe_allow_html=True)
 
-# === Simple Email + Password Login ===
-users = {
-    "admin@phntechnology.com": "admin123",
-    "user@phntechnology.com": "userpass"
-}
-
+# === Email Login ===
 email = st.text_input("📧 Enter your PHN Technology email:")
-password = st.text_input("🔑 Enter password:", type="password")
-
-if email and not email.endswith("@phntechnology.com"):
+if not email.endswith("@phntechnology.com"):
     st.error("Access restricted to PHN Technology emails only.")
-    st.stop()
-
-if email and password:
-    if email in users and users[email] == password:
-        st.success("✅ Access granted.")
-    else:
-        st.error("❌ Invalid credentials.")
-        st.stop()
-else:
     st.stop()
 
 # === Load or initialize stats ===
@@ -83,7 +67,12 @@ if os.path.exists(stats_file):
     with open(stats_file, "r") as f:
         stats = json.load(f)
 else:
-    stats = {"total": 0, "qualified": 0, "appeared": 0}
+    stats = {
+        "total_students": 0,
+        "qualified": 0,
+        "appeared": 0,
+        "issued_by": {}
+    }
 
 # === File Upload ===
 uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
@@ -154,16 +143,20 @@ if uploaded_file:
         st.success(f"✅ Certificates generated for {len(df)} students.")
 
         # === Update persistent stats ===
-        stats["total"] += len(df)
-        stats["qualified"] += df[df['Qualified for Level 2'] == 'Qualified']['Name'].nunique()
-        stats["appeared"] += df['Name'].nunique()
+        qualified_count = df[df['Qualified for Level 2'] == 'Qualified']['Name'].nunique()
+        appeared_count = df['Name'].nunique()
+
+        stats["total_students"] += len(df)
+        stats["qualified"] += qualified_count
+        stats["appeared"] += appeared_count
+        stats["issued_by"][email] = stats["issued_by"].get(email, 0) + len(df)
 
         with open(stats_file, "w") as f:
             json.dump(stats, f)
 
         # === Show stats
         st.subheader("📊 Scholarship Stats (All-Time)")
-        st.metric("Total Students Processed", stats["total"])
+        st.metric("Total Students Processed", stats["total_students"])
         st.metric("Qualified Students", stats["qualified"])
         st.metric("Appeared Students", stats["appeared"])
 
