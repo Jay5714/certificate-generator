@@ -55,21 +55,18 @@ st.markdown("""
     <hr>
 """, unsafe_allow_html=True)
 
-# === User Authentication ===
-users = {
-    "jaydeep.nikam@phntechnology.com": "jaydeep123",
-    "mayur.sabale@phntechnology.com": "mayur456"
-}
+# === Common Password Authentication ===
+COMMON_PASSWORD = "phnsecure2025"
 
 email = st.text_input("📧 Enter your PHN Technology email:")
-password = st.text_input("🔑 Enter your password:", type="password")
+password = st.text_input("🔑 Enter shared password:", type="password")
 
 if not email.endswith("@phntechnology.com"):
     st.error("Access restricted to PHN Technology emails only.")
     st.stop()
 
-if email not in users or users[email] != password:
-    st.error("Invalid email or password.")
+if password != COMMON_PASSWORD:
+    st.error("Incorrect password.")
     st.stop()
 
 st.success("✅ Access granted.")
@@ -222,4 +219,3 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
-
