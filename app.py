@@ -64,7 +64,7 @@ st.markdown("""
 # === Common Password Authentication ===
 COMMON_PASSWORD = "Phn@2025"
 
-email = st.text_input("📧 Enter your official email id eg, user@phntechnology.com:")
+email = st.text_input("📧 Enter your official email ID ")
 password = st.text_input("🔑 Enter shared password:", type="password")
 
 if not email.endswith("@phntechnology.com"):
@@ -225,5 +225,6 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
+
 
 
