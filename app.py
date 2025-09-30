@@ -11,10 +11,10 @@ from datetime import datetime
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(-45deg, #1D4ED8, #0f2027, #203a43, #1D4ED8);
+        background: linear-gradient(135deg, #0f2027, #203a43, #1D4ED8);
         background-size: 400% 400%;
         animation: gradientShift 20s ease infinite;
-        color: white;
+        color: #f0f0f0;
     }
 
     @keyframes gradientShift {
@@ -23,42 +23,40 @@ st.markdown("""
         100% {background-position: 0% 50%;}
     }
 
-    h1, h2, h3, p {
-        color: #ffffff;
+    h1, h2, h3, p, label, .stTextInput label {
+        color: #ffffff !important;
         font-family: 'Segoe UI', sans-serif;
-        text-align: center;
     }
 
-    .stButton>button, .stDownloadButton>button {
-        background-color: #ffffff !important;
-        color: #1D4ED8 !important;
-        border-radius: 5px;
-        font-weight: bold;
-    }
-
-    .stFileUploader, .stTextInput, .stSelectbox {
+    .stTextInput input, .stFileUploader, .stDownloadButton button, .stButton button {
         background-color: #1e1e1e !important;
-        color: white !important;
+        color: #ffffff !important;
+        border: 1px solid #00ffff !important;
+        border-radius: 5px;
+    }
+
+    .stMetric label {
+        color: #ffffff !important;
     }
 
     hr {
-        border: 1px solid #ffffff;
+        border: 1px solid #00ffff;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# === Centered Title ===
+# === Title ===
 st.markdown("""
-    <h1>🎓 Certificate Generator</h1>
-    <h3>PHN Technology Scholarship Portal</h3>
-    <p> AI • IoT • Robotics </p>
+    <h1 style='text-align: center;'>🎓 Certificate Generator</h1>
+    <h3 style='text-align: center;'>PHN Technology Robotics Scholarship Portal</h3>
+    <p style='text-align: center;'>Empowering Innovation • AI • IoT • Robotics • Future Talent</p>
     <hr>
 """, unsafe_allow_html=True)
 
 # === Common Password Authentication ===
-COMMON_PASSWORD = "Phn2025"
+COMMON_PASSWORD = "phnsecure2025"
 
-email = st.text_input("📧 Enter eg,user@phntechnology.com email:")
+email = st.text_input("📧 Enter your PHN Technology email:")
 password = st.text_input("🔑 Enter shared password:", type="password")
 
 if not email.endswith("@phntechnology.com"):
@@ -219,4 +217,3 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
-
