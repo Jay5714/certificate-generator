@@ -48,13 +48,13 @@ st.markdown("""
 # === Title ===
 st.markdown("""
     <h1 style='text-align: center;'>🎓 Certificate Generator</h1>
-    <h3 style='text-align: center;'>PHN Technology Robotics Scholarship Portal</h3>
-    <p style='text-align: center;'>Empowering Innovation • AI • IoT • Robotics • Future Talent</p>
+    <h3 style='text-align: center;'>PHN Technology Scholarship Portal</h3>
+    <p style='text-align: center;'>AI • IoT • Robotics </p>
     <hr>
 """, unsafe_allow_html=True)
 
 # === Common Password Authentication ===
-COMMON_PASSWORD = "phnsecure2025"
+COMMON_PASSWORD = "Phn@2025"
 
 email = st.text_input("📧 Enter your PHN Technology email:")
 password = st.text_input("🔑 Enter shared password:", type="password")
@@ -217,3 +217,4 @@ if uploaded_file:
 if st.button("🗑️ Clear"):
     st.write("🔄 Resetting app...")
     st.stop()
+
