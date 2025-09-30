@@ -4,8 +4,9 @@ import fitz  # PyMuPDF
 import os
 import zipfile
 from io import BytesIO
+from datetime import datetime
 
-# === Custom Styling ===
+# === Styling ===
 st.markdown("""
     <style>
     .stApp {
@@ -19,6 +20,14 @@ st.markdown("""
         0% {background-position: 0% 50%;}
         50% {background-position: 100% 50%;}
         100% {background-position: 0% 50%;}
+    }
+
+    .centered {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 20px;
     }
 
     h1, h2, h3, p {
@@ -44,7 +53,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# === App Header ===
+# === Header ===
+st.markdown("<div class='centered'>", unsafe_allow_html=True)
 st.title("🎓 Certificate Generator")
 st.markdown("""
     <h2 style='text-align: center; color: #ffffff; font-family: Segoe UI;'>
@@ -56,101 +66,124 @@ st.markdown("""
     <hr>
 """, unsafe_allow_html=True)
 
-# === File Upload ===
-uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
+# === Access Control ===
+visitor_name = st.text_input("👤 Enter your name or email to access:")
+access_code = st.text_input("🔐 Enter access code:", type="password")
 
-# === Configuration ===
-font_path = os.path.join("fonts", "DancingScript-VariableFont_wght.ttf")
-font_name = "DancingScript"
-font_size = 23
-pdf_file = "phnscholar certificate 6.pdf"
+AUTHORIZED_CODE = "PHN2025"
 
-if uploaded_file:
-    df = pd.read_excel(uploaded_file, header=1, engine='openpyxl')
-    df.columns = df.columns.str.strip()
+if visitor_name and access_code == AUTHORIZED_CODE:
+    st.success("✅ Access granted. Welcome!")
 
-    if not os.path.exists(font_path):
-        st.error(f"Font file not found at: {font_path}")
-        st.stop()
+    # === Visitor Log ===
+    if "visitor_log" not in st.session_state:
+        st.session_state.visitor_log = []
 
-    if not os.path.exists(pdf_file):
-        st.error(f"Certificate template not found: {pdf_file}")
-        st.stop()
+    st.session_state.visitor_log.append({
+        "name": visitor_name,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    })
 
-    doc = fitz.open(pdf_file)
-    page_1 = doc.load_page(0)
-    page_2 = doc.load_page(1)
+    # === File Upload ===
+    uploaded_file = st.file_uploader("📄 Upload Excel File (.xlsx)", type=["xlsx"])
 
-    qualified_pdfs = {}
-    not_qualified_pdfs = {}
+    font_path = os.path.join("fonts", "DancingScript-VariableFont_wght.ttf")
+    font_name = "DancingScript"
+    font_size = 23
+    pdf_file = "phnscholar certificate 6.pdf"
 
-    if st.button("🎯 Generate Certificates"):
-        for _, row in df.iterrows():
-            name = str(row['Name']).strip()
-            status = str(row['Qualified for Level 2']).strip() if pd.notna(row['Qualified for Level 2']) else ""
+    if uploaded_file:
+        df = pd.read_excel(uploaded_file, header=1, engine='openpyxl')
+        df.columns = df.columns.str.strip()
 
-            if status == "Qualified":
-                template_page = page_2
-                y_coord = 401
-                target_dict = qualified_pdfs
-            else:
-                template_page = page_1
-                y_coord = 383
-                target_dict = not_qualified_pdfs
+        if not os.path.exists(font_path):
+            st.error(f"Font file not found at: {font_path}")
+            st.stop()
 
-            new_pdf = fitz.open()
-            new_page = new_pdf.new_page(width=template_page.rect.width, height=template_page.rect.height)
-            new_page.show_pdf_page(new_page.rect, doc, template_page.number)
+        if not os.path.exists(pdf_file):
+            st.error(f"Certificate template not found: {pdf_file}")
+            st.stop()
 
-            new_page.insert_font(font_name, font_path)
+        doc = fitz.open(pdf_file)
+        page_1 = doc.load_page(0)
+        page_2 = doc.load_page(1)
 
-            font = fitz.Font(fontfile=font_path)
-            text_width = font.text_length(name, fontsize=font_size)
-            page_width = template_page.rect.width
-            x_center = (page_width - text_width) / 2
+        qualified_pdfs = {}
+        not_qualified_pdfs = {}
 
-            new_page.insert_text(
-                (x_center, y_coord),
-                name,
-                fontsize=font_size,
-                fontname=font_name,
-                fill=(0, 0, 0)
-            )
+        if st.button("🎯 Generate Certificates"):
+            for _, row in df.iterrows():
+                name = str(row['Name']).strip()
+                status = str(row['Qualified for Level 2']).strip() if pd.notna(row['Qualified for Level 2']) else ""
 
-            output = BytesIO()
-            new_pdf.save(output)
-            new_pdf.close()
-            target_dict[name] = output.getvalue()
+                if status == "Qualified":
+                    template_page = page_2
+                    y_coord = 401
+                    target_dict = qualified_pdfs
+                else:
+                    template_page = page_1
+                    y_coord = 383
+                    target_dict = not_qualified_pdfs
 
-        st.success(f"✅ Certificates generated for {len(df)} students.")
+                new_pdf = fitz.open()
+                new_page = new_pdf.new_page(width=template_page.rect.width, height=template_page.rect.height)
+                new_page.show_pdf_page(new_page.rect, doc, template_page.number)
 
-        # Individual download buttons
-        for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
-            st.download_button(
-                label=f"📥 Download {name}'s Certificate",
-                data=pdf_bytes,
-                file_name=f"{name}_certificate.pdf",
-                mime="application/pdf"
-            )
+                new_page.insert_font(font_name, font_path)
 
-        # ZIP download button
-        zip_buffer = BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+                font = fitz.Font(fontfile=font_path)
+                text_width = font.text_length(name, fontsize=font_size)
+                page_width = template_page.rect.width
+                x_center = (page_width - text_width) / 2
+
+                new_page.insert_text(
+                    (x_center, y_coord),
+                    name,
+                    fontsize=font_size,
+                    fontname=font_name,
+                    fill=(0, 0, 0)
+                )
+
+                output = BytesIO()
+                new_pdf.save(output)
+                new_pdf.close()
+                target_dict[name] = output.getvalue()
+
+            st.success(f"✅ Certificates generated for {len(df)} students.")
+
             for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
-                safe_name = "".join(c for c in name if c.isalnum() or c in " _-")
-                zip_file.writestr(f"{safe_name}_certificate.pdf", pdf_bytes)
-        zip_buffer.seek(0)
+                st.download_button(
+                    label=f"📥 Download {name}'s Certificate",
+                    data=pdf_bytes,
+                    file_name=f"{name}_certificate.pdf",
+                    mime="application/pdf"
+                )
 
-        st.download_button(
-            label="📦 Download All Certificates as ZIP",
-            data=zip_buffer,
-            file_name="certificates.zip",
-            mime="application/zip"
-        )
+            zip_buffer = BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w") as zip_file:
+                for name, pdf_bytes in {**qualified_pdfs, **not_qualified_pdfs}.items():
+                    safe_name = "".join(c for c in name if c.isalnum() or c in " _-")
+                    zip_file.writestr(f"{safe_name}_certificate.pdf", pdf_bytes)
+            zip_buffer.seek(0)
 
-# 🗑️ Clear button to reset the app safely
-if st.button("🗑️ Clear"):
-    st.write("🔄 Resetting app...")
-    st.stop()
+            st.download_button(
+                label="📦 Download All Certificates as ZIP",
+                data=zip_buffer,
+                file_name="certificates.zip",
+                mime="application/zip"
+            )
 
+    if st.button("🗑️ Clear"):
+        st.write("🔄 Resetting app...")
+        st.stop()
+
+    # === Show Visitor Log ===
+    with st.expander("📋 View Visitor Log"):
+        for entry in st.session_state.visitor_log:
+            st.write(f"{entry['timestamp']} — {entry['name']}")
+
+else:
+    if visitor_name and access_code:
+        st.error("❌ Access denied. Invalid code.")
+st.markdown("</div>", unsafe_allow_html=True)
 
